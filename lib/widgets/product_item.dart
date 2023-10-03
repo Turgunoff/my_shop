@@ -1,43 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:my_shop/models/product.dart';
+import 'package:my_shop/screens/product_detail_screen.dart';
+import 'package:provider/provider.dart';
 
 class ProductItem extends StatelessWidget {
-  final String image;
-  final String title;
   const ProductItem({
     super.key,
-    required this.image,
-    required this.title,
   });
 
   @override
   Widget build(BuildContext context) {
+    final product = Provider.of<Product>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
-      child: GridTile(
-        footer: GridTileBar(
-          leading: IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.favorite_outline,
-              color: Theme.of(context).primaryColor,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.of(context).pushNamed(
+            ProductDetailScreen.routeName,
+            arguments: product.id,
+          );
+        },
+        child: GridTile(
+          footer: GridTileBar(
+            leading: Consumer<Product>(
+              builder: (ctx, pro, child) {
+                return IconButton(
+                  onPressed: () {
+                    pro.toggleFavorite();
+                  },
+                  icon: Icon(
+                    pro.isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                );
+              },
+            ),
+            trailing: IconButton(
+              onPressed: () {},
+              icon: Icon(
+                Icons.shopping_cart_rounded,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+            backgroundColor: const Color.fromARGB(190, 0, 0, 0),
+            title: Text(
+              product.title,
+              textAlign: TextAlign.center,
             ),
           ),
-          trailing: IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.shopping_cart_rounded,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-          backgroundColor: const Color.fromARGB(190, 0, 0, 0),
-          title: Text(
-            title,
-            textAlign: TextAlign.center,
-          ),
-        ),
-        child: Image.network(
-          image,
-          fit: BoxFit.cover,
+          child: Image.network(product.imageUrl, fit: BoxFit.cover),
         ),
       ),
     );
