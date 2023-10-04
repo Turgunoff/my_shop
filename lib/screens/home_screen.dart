@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:my_shop/screens/cart_screen.dart';
+import 'package:my_shop/widgets/custom_cart.dart';
 import 'package:my_shop/widgets/products_grid.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/cart.dart';
 import '../providers/products.dart';
 
 enum FiltersOption {
@@ -48,6 +51,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ];
             },
+          ),
+          Consumer<Cart>(
+            builder: (ctx, cart, child) {
+              return CustomCart(
+                number: cart.itemsCount().toString(),
+                child: child!,
+              );
+            },
+            child: IconButton(
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(CartScreen.routeName),
+                icon: const Icon(Icons.shopping_cart)),
           ),
         ],
       ),

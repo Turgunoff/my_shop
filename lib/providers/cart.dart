@@ -9,6 +9,18 @@ class Cart with ChangeNotifier {
     return {..._items};
   }
 
+  int itemsCount() {
+    return _items.length;
+  }
+
+  double get totalPrice {
+    var total = 0.0;
+    _items.forEach((key, cartItem) {
+      total += cartItem.price * cartItem.quantity;
+    });
+    return total;
+  }
+
   void addToCart(String productId, String title, String image, double price) {
     if (_items.containsKey(productId)) {
       //sonini ko'paytirish
@@ -35,5 +47,30 @@ class Cart with ChangeNotifier {
         ),
       );
     }
+    notifyListeners();
+  }
+
+  void removeSingleItem(String productId) {
+    if (!_items.containsKey(productId)) {
+      return;
+    }
+    if (_items[productId]!.quantity > 1) {
+      _items.update(
+        productId,
+        (currentProduct) => CartItem(
+          id: currentProduct.id,
+          title: currentProduct.title,
+          quantity: currentProduct.quantity - 1,
+          price: currentProduct.price,
+          image: currentProduct.image,
+        ),
+      );
+      notifyListeners();
+    }
+  }
+
+  void removeItem(String id) {
+    _items.remove(id);
+    notifyListeners();
   }
 }
