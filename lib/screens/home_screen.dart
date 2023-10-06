@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:my_shop/screens/cart_screen.dart';
+import 'package:my_shop/widgets/app_drawer.dart';
 import 'package:my_shop/widgets/custom_cart.dart';
 import 'package:my_shop/widgets/products_grid.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/cart.dart';
-import '../providers/products.dart';
 
 enum FiltersOption {
   All,
@@ -14,6 +14,8 @@ enum FiltersOption {
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  static const routeName = '/home';
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -66,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      drawer: AppDrawer(),
       body: ProductsGrid(_showOnlyFavorites),
     );
   }

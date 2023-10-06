@@ -40,7 +40,23 @@ class ProductItem extends StatelessWidget {
             trailing: IconButton(
               onPressed: () {
                 cart.addToCart(
-                    product.id, product.title, product.imageUrl, product.price);
+                  product.id,
+                  product.title,
+                  product.imageUrl,
+                  product.price,
+                );
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Maxsulot qo\'shildi'),
+                    action: SnackBarAction(
+                      label: 'Bekor qilish',
+                      onPressed: () {
+                        cart.removeSingleItem(product.id, isCartButton: true);
+                      },
+                    ),
+                  ),
+                );
               },
               icon: Icon(
                 Icons.shopping_cart_rounded,

@@ -19,6 +19,34 @@ class CartListItem extends StatelessWidget {
     required this.productId,
   });
 
+  void _notifyUserAboutDelete(BuildContext context, Function() removeItem) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Ishonchingiz komilmi?'),
+          content: const Text('Savatchadan bu maxsulot o\'chmoqda!'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('BEKOR QILISH'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                removeItem();
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: const Text('O\'CHIRISH'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<Cart>(context, listen: false);
@@ -29,7 +57,10 @@ class CartListItem extends StatelessWidget {
         motion: const ScrollMotion(),
         children: [
           IconButton(
-            onPressed: () => cart.removeItem(productId),
+            onPressed: () => _notifyUserAboutDelete(
+              context,
+              () => cart.removeItem(productId),
+            ),
             splashRadius: 20,
             icon: Icon(
               Icons.delete,
@@ -39,6 +70,7 @@ class CartListItem extends StatelessWidget {
         ],
       ),
       child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         child: ListTile(
           leading: CircleAvatar(
             backgroundImage: NetworkImage(imageUrl),
