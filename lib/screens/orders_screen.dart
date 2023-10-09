@@ -5,10 +5,32 @@ import 'package:provider/provider.dart';
 
 import '../widgets/order_item.dart';
 
-class OrdersScreen extends StatelessWidget {
+class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
 
   static const routeName = '/orders';
+
+  @override
+  State<OrdersScreen> createState() => _OrdersScreenState();
+}
+
+class _OrdersScreenState extends State<OrdersScreen> {
+  var _isloading = false;
+
+  @override
+  void initState() {
+    Future.delayed(Duration.zero).then((_) {
+      setState(() {
+        _isloading = true;
+      });
+      Provider.of<Orders>(context, listen: false).getOrders().then((_) {
+        setState(() {
+          _isloading = false;
+        });
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +40,9 @@ class OrdersScreen extends StatelessWidget {
         title: const Text('Buyurtmalar'),
       ),
       drawer: const AppDrawer(),
-      body: ListView.builder(
+      body: orders.items.isEmpty
+          ? const Center(child: Text('Buyurtmalar mavjud emas'))
+          : ListView.builder(
         itemCount: orders.items.length,
         itemBuilder: (ctx, i) {
           final order = orders.items[i];

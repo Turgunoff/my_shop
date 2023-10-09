@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:my_shop/providers/cart.dart';
-import 'package:my_shop/providers/orders.dart';
-import 'package:my_shop/widgets/cart_list_item.dart';
 import 'package:provider/provider.dart';
+
+import '../providers/cart.dart';
+import '../screens/orders_screen.dart';
+import '../providers/orders.dart';
+import '../widgets/cart_list_item.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -41,16 +43,7 @@ class CartScreen extends StatelessWidget {
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
                   const SizedBox(width: 10),
-                  TextButton(
-                    onPressed: () {
-                      Provider.of<Orders>(context, listen: false).addToOrders(
-                        cart.items.values.toList(),
-                        cart.totalPrice,
-                      );
-                      cart.clearCart();
-                    },
-                    child: const Text('BUYURTMA QILISH'),
-                  )
+                  OrderButton(cart: cart)
                 ],
               ),
             ),
@@ -73,6 +66,47 @@ class CartScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    super.key,
+    required this.cart,
+  });
+
+  final Cart cart;
+
+  @override
+  State<OrderButton> createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  @override
+  Widget build(BuildContext context) {
+    var _isLoading = false;
+    return TextButton(
+      onPressed: (widget.cart.items.isEmpty)
+          ? null
+          : () async {
+              setState(() {
+                _isLoading = true;
+              });
+              await Provider.of<Orders>(context, listen: false).addToOrders(
+                widget.cart.items.values.toList(),
+                widget.cart.totalPrice,
+              );
+              setState(() {
+                _isLoading = false;
+              });
+              widget.cart.clearCart();
+              Navigator.of(context)
+                  .pushReplacementNamed(OrdersScreen.routeName);
+            },
+      child: _isLoading
+          ? const CircularProgressIndicator()
+          : const Text('BUYURTMA QILISH'),
     );
   }
 }

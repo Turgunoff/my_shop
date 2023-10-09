@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:my_shop/services/http_exception.dart';
 
 import '../models/product.dart';
 
@@ -56,17 +57,18 @@ class Products with ChangeNotifier {
     try {
       final response = await http.get(url);
 
-      if (jsonDecode(response.body) != null) {
+      if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         final List<Product> loadedProducts = [];
         data.forEach((productId, productData) {
           loadedProducts.add(Product(
             id: productId,
-            title: productData['title'],
-            description: productData['description'],
-            price: productData['price'],
-            imageUrl: productData['imageUrl'],
-            isFavorite: productData['isFavorite'],
+            title: productData['title'] as String,
+            description: productData['description'] as String,
+            price: productData['price'] as double,
+            // Assuming price is a double, adjust if needed
+            imageUrl: productData['imageUrl'] as String,
+            isFavorite: productData['isFavorite'] as bool,
           ));
         });
         _list = loadedProducts;
@@ -107,12 +109,30 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(Product updateProduct) {
+  Future<void> updateProduct(Product updateProduct) async {
     final productIndex =
         _list.indexWhere((product) => product.id == updateProduct.id);
     if (productIndex >= 0) {
-      _list[productIndex] = updateProduct;
-      notifyListeners();
+      final url = Uri.parse(
+          'https://fir-app-91c1f-default-rtdb.firebaseio.com/products/${updateProduct.id}.json');
+
+      try {
+        await http.patch(
+          url,
+          body: jsonEncode(
+            {
+              'title': updateProduct.title,
+              'description': updateProduct.description,
+              'price': updateProduct.price,
+              'imageUrl': updateProduct.imageUrl,
+            },
+          ),
+        );
+        _list[productIndex] = updateProduct;
+        notifyListeners();
+      } catch (error) {
+        rethrow;
+      }
     }
   }
 
@@ -120,8 +140,24 @@ class Products with ChangeNotifier {
     return _list.firstWhere((product) => product.id == productId);
   }
 
-  void deleteProduct(String id) {
-    _list.removeWhere((product) => product.id == id);
-    notifyListeners();
+  Future<void> deleteProduct(String id) async {
+    final url = Uri.parse(
+        'https://fir-app-91c1f-default-rtdb.firebaseio.com/products/$id.json');
+    try {
+      var deletingProduct = _list.firstWhere((product) => product.id == id);
+      final productIndex = _list.indexWhere((product) => product.id == id);
+      _list.removeWhere((product) => product.id == id);
+      notifyListeners();
+
+      final response = await http.delete(url);
+
+      if (response.statusCode >= 400) {
+        _list.insert(productIndex, deletingProduct);
+        notifyListeners();
+        throw HttpException('O\'chirishda xatolik');
+      }
+    } catch (error) {
+      rethrow;
+    }
   }
 }

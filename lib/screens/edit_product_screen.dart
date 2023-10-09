@@ -52,21 +52,37 @@ class _EditProductScreenState extends State<EditProductScreen> {
               ],
             ),
           );
-          print(error);
-
-        } finally {
-          setState(() {
-            _isLoading = false;
-          });
-          Navigator.of(context).pop();
         }
+        // finally {
+        //   setState(() {
+        //     _isLoading = false;
+        //   });
+        //   Navigator.of(context).pop();
+        // }
       } else {
-        Provider.of<Products>(context, listen: false).updateProduct(_product);
-        setState(() {
-          _isLoading = false;
-        });
-        Navigator.of(context).pop();
+        try {
+          await Provider.of<Products>(context, listen: false)
+              .updateProduct(_product);
+        } catch (e) {
+          await showDialog<Null>(
+            context: (context),
+            builder: (ctx) => AlertDialog(
+              title: const Text('Xatolik!'),
+              content: const Text('Maxsulot qo\'shishda xatolik'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Ok'),
+                ),
+              ],
+            ),
+          );
+        }
       }
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.of(context).pop();
     }
   }
 
