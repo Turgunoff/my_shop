@@ -15,17 +15,17 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
-  var _isloading = false;
+  var _isLoading = false;
 
   @override
   void initState() {
     Future.delayed(Duration.zero).then((_) {
       setState(() {
-        _isloading = true;
+        _isLoading = true;
       });
       Provider.of<Orders>(context, listen: false).getOrders().then((_) {
         setState(() {
-          _isloading = false;
+          _isLoading = false;
         });
       });
     });

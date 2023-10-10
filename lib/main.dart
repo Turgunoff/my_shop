@@ -27,35 +27,38 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider<Auth>(create: (ctx) => Auth()),
-          ChangeNotifierProvider<Products>(create: (ctx) => Products()),
-          ChangeNotifierProvider<Cart>(create: (ctx) => Cart()),
-          ChangeNotifierProvider<Orders>(create: (ctx) => Orders()),
-        ],
-        child: Consumer<Auth>(
-          builder: (ctx, authData, child) {
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              theme: ThemeData(
-                primarySwatch: Colors.teal,
-                fontFamily: 'Lato',
-                scaffoldBackgroundColor: Colors.white,
-              ),
-              home: authData.isAuth ? const HomeScreen() : const AuthScreen(),
-              routes: {
-                HomeScreen.routeName: (ctx) => const HomeScreen(),
-                ProductDetailScreen.routeName: (ctx) =>
-                    const ProductDetailScreen(),
-                CartScreen.routeName: (ctx) => const CartScreen(),
-                OrdersScreen.routeName: (ctx) => const OrdersScreen(),
-                ManageProductScreen.routeName: (ctx) =>
-                    const ManageProductScreen(),
-                EditProductScreen.routeName: (ctx) => const EditProductScreen(),
-                AuthScreen.routeName: (ctx) => const AuthScreen(),
-              },
-            );
-          },
-        ));
+      providers: [
+        ChangeNotifierProvider<Auth>(create: (ctx) => Auth()),
+        ChangeNotifierProxyProvider<Auth, Products>(
+            create: (ctx) => Products(),
+            update: (ctx, auth, previousProducts) =>
+                Products()..setParams(auth.token!)),
+        ChangeNotifierProvider<Cart>(create: (ctx) => Cart()),
+        ChangeNotifierProvider<Orders>(create: (ctx) => Orders()),
+      ],
+      child: Consumer<Auth>(
+        builder: (ctx, authData, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              primarySwatch: Colors.teal,
+              fontFamily: 'Lato',
+              scaffoldBackgroundColor: Colors.white,
+            ),
+            home: authData.isAuth ? const HomeScreen() : const AuthScreen(),
+            routes: {
+              HomeScreen.routeName: (ctx) => const HomeScreen(),
+              ProductDetailScreen.routeName: (ctx) =>
+                  const ProductDetailScreen(),
+              CartScreen.routeName: (ctx) => const CartScreen(),
+              OrdersScreen.routeName: (ctx) => const OrdersScreen(),
+              ManageProductScreen.routeName: (ctx) =>
+                  const ManageProductScreen(),
+              EditProductScreen.routeName: (ctx) => const EditProductScreen(),
+            },
+          );
+        },
+      ),
+    );
   }
 }

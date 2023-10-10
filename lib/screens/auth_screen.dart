@@ -40,6 +40,7 @@ class _AuthScreenState extends State<AuthScreen> {
       builder: (ctx) {
         return AlertDialog(
           title: const Text('Xatolik'),
+          content: Text(message),
           actions: [
             TextButton(
               onPressed: () {
@@ -73,6 +74,7 @@ class _AuthScreenState extends State<AuthScreen> {
           );
         }
       } on HttpException catch (error) {
+        print(error);
         var errorMessage = 'Xatolik sodir bo\'ldi';
         if (error.message.contains('EMAIL_EXISTS')) {
           errorMessage = 'Email band';
@@ -80,7 +82,7 @@ class _AuthScreenState extends State<AuthScreen> {
           errorMessage = 'To\'g\'ri email kiriting';
         } else if (error.message.contains('WEAK_PASSWORD')) {
           errorMessage = 'Juda oson parol';
-        } else if (error.message.contains('EMAIL_NOT_FOUND')) {
+        } else if (error.message.contains('INVALID_LOGIN_CREDENTIALS')) {
           errorMessage = 'Email topilmadi';
         } else if (error.message.contains('INVALID_PASSWORD')) {
           errorMessage = 'Parol noto\'g\'ri';
